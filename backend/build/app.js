@@ -9,12 +9,19 @@ const express_1 = __importDefault(require("express"));
 // import { PrismaClient } from '@prisma/client';
 // import cors from "cors";
 const user_controller_1 = require("./controller/user.controller");
-const getAllUser_controller_1 = require("./controller/getAllUser.controller");
-const dataController = new getAllUser_controller_1.DataController();
+// import { DataController } from './controller/getAllUser.controller';
+// const dataController = new DataController();
+const user_controller_2 = require("./controller/user.controller");
+const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 const port = 4000;
+const corsOptions = {
+    credentials: true,
+    origin: ['http://localhost:3000', 'http://localhost:80']
+};
 // middleware
 app.use(express_1.default.json());
+app.use((0, cors_1.default)(corsOptions));
 // app.use(express.static('public'));
 // route
 app.post("/post", user_controller_1.userController);
@@ -22,10 +29,13 @@ app.get("/find/:id", user_controller_1.updateController);
 // app.get("/get", getAllData)
 app.delete("/delete/:id", user_controller_1.deleteUser);
 app.put("/update/:id", user_controller_1.updateUser);
-app.get('/allData', (req, res) => dataController.getAllData(req, res));
+// app.get('/allData', (req, res) => dataController.getAllData(req, res));
 app.get("/all", user_controller_1.getAllDatas);
 app.post("/allBasic", user_controller_1.getAllBasicPay);
 app.post("/ded", user_controller_1.getAllDeduction);
+app.get('/getAllData', user_controller_2.getAllData);
+app.post('/register', user_controller_1.signUp);
+app.post('/login', user_controller_1.login);
 // Start the Express server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

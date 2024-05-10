@@ -8,9 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllDatas = exports.getAllDeduction = exports.getAllBasicPay = exports.updateUser = exports.deleteUser = exports.updateController = exports.userController = void 0;
+exports.login = exports.signUp = exports.getAllDatas = exports.getAllDeduction = exports.getAllBasicPay = exports.updateUser = exports.deleteUser = exports.getAllData = exports.updateController = exports.userController = void 0;
 const client_1 = require("@prisma/client");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma = new client_1.PrismaClient();
 const userController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, address } = req.body;
@@ -46,7 +51,7 @@ const updateController = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.updateController = updateController;
 // export const getAllData = async (req: Request, res: Response) => {
-//     try {        
+//     try {
 //         const page = parseInt(req.query.page as string, 10);
 //         const limit = parseInt(req.query.limit as string, 10) || 10;
 //         const count = await prisma.user.count();
@@ -61,7 +66,7 @@ exports.updateController = updateController;
 //                 address:true,
 //             },
 //             orderBy: {
-//                 id: 'asc'
+//                 id: 'desc'
 //             },
 //             where: {
 //                 id: {
@@ -79,6 +84,22 @@ exports.updateController = updateController;
 //         return res.status(500).json({ error: "Failed to retrieve users" });
 //     }
 // }
+const getAllData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const values = yield prisma.user.findMany({
+        skip: 10,
+        orderBy: {
+            id: 'asc'
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            address: true
+        }
+    });
+    res.json({ status: 200, data: values, msg: "user fetched" });
+});
+exports.getAllData = getAllData;
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const values = yield prisma.user.delete({
@@ -153,7 +174,6 @@ const getAllDatas = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             deduction_amount,
             total_amount
         }));
-        // Send the JSON response to the client
         res.json(data);
     }
     catch (error) {
@@ -162,4 +182,64 @@ const getAllDatas = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getAllDatas = getAllDatas;
+////////////////////////////////////////////////
+const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, email, password } = req.body;
+    try {
+        const saltRounds = 10;
+        const hashedPassword = yield bcrypt_1.default.hash(password, saltRounds);
+        const values = yield prisma.register.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword
+            }
+        });
+        res.json({
+            message: "User created successfully",
+            values
+        });
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
+exports.signUp = signUp;
+const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    try {
+        const values = yield prisma.register.findFirst({
+            select: {
+                email: true,
+                password: true,
+                id: true,
+                name: true
+            },
+            where: {
+                email: email,
+            }
+        });
+        if (values) {
+            const dat = yield bcrypt_1.default.compare(password, values.password);
+            const payload = {
+                id: values.id,
+                email: values.email,
+                name: values.name
+            };
+            if (dat) {
+                const token = jsonwebtoken_1.default.sign(payload, 'your-secret-key', {
+                    expiresIn: '1h',
+                });
+                res.status(200).json({ token });
+            }
+            else {
+                res.status(401).send('Failed');
+            }
+        }
+    }
+    catch (err) {
+        console.log(err);
+    }
+});
+exports.login = login;
 //# sourceMappingURL=user.controller.js.map

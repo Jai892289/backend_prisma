@@ -1,25 +1,39 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { useQuery } from 'react-query';
-import image from "../../assets/spinner.svg"
-import loader from "../../global/loader";
 import Skeleton from '../Skeleton/Index';
 
 
 const fetchData = async () => {
     return await fetch('https://jsonplaceholder.typicode.com/posts')
         .then(res => res.json())
+    
 }
+
 
 const Blog = () => {
     const [loading, setLoading] = useState(true)
     const { isLoading, data, error } = useQuery('fetchData', fetchData)
-
+const[datas, setDatas] = useState()
     useEffect(() => {
         setTimeout(() => {
             setLoading(false)
         }, 2000)
     }, [])
+
+    const API = process.env.NEXT_PUBLIC_API_ENDPOINT
+
+    const fetchDatas = async ()=> {
+    return await fetch(`${API}/getAllData`)
+    .then((res) => res.json())
+    .then((data)=> setDatas(data))
+    }
+    
+    useEffect(() => {
+       fetchDatas() 
+    }, [])
+
+    console.log("datas", datas)
 
     if (isLoading) {
         return (

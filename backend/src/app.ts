@@ -3,18 +3,26 @@ import express from 'express';
 // import path from 'path';
 // import { PrismaClient } from '@prisma/client';
 // import cors from "cors";
-import { deleteUser, getAllBasicPay, getAllDatas, getAllDeduction, updateController, updateUser, userController } from './controller/user.controller';
+import { deleteUser, getAllBasicPay, getAllDatas ,  getAllDeduction, login, signUp, updateController, updateUser, userController } from './controller/user.controller';
+// import { DataController } from './controller/getAllUser.controller';
 
-import { DataController } from './controller/getAllUser.controller';
-
-const dataController = new DataController();
-
+// const dataController = new DataController();
+import { getAllData } from './controller/user.controller';
+import cors from "cors";
 
 const app = express();
 const port = 4000;
 
+const corsOptions = {
+    credentials: true,
+    origin: ['http://localhost:3000', 'http://localhost:80'] 
+};
+
+
 // middleware
 app.use(express.json());
+app.use(cors(corsOptions));
+
 
 // app.use(express.static('public'));
 
@@ -26,7 +34,7 @@ app.get("/find/:id", updateController)
 app.delete("/delete/:id", deleteUser)
 app.put("/update/:id", updateUser)
 
-app.get('/allData', (req, res) => dataController.getAllData(req, res));
+// app.get('/allData', (req, res) => dataController.getAllData(req, res));
 
 
 app.get("/all", getAllDatas)
@@ -36,6 +44,13 @@ app.post("/allBasic", getAllBasicPay)
 app.post("/ded", getAllDeduction)
 
 
+
+app.get('/getAllData', getAllData)
+
+
+
+app.post('/register', signUp)
+app.post('/login', login)
 
 
 // Start the Express server
