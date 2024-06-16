@@ -14,21 +14,103 @@ datasource db {
 }
 
 model File {
-  id        Int      @id @default(autoincrement())
-  image     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  image       String
+  buffer      Bytes?
+  size        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @map("updated_at")
 }
 
 model User {
-  id      Int     @id @default(autoincrement())
-  name    String?
-  email   String?
-  address String?
+  id          Int     @id @default(autoincrement())
+  name        String?
+  email       String?
+  address     String?
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @map("updated_at")
+}
+
+model Post {
+  id          Int @id @default(autoincrement())
+  title       String
+  content     String?
+  image       String?
+
+  author      Register @relation(fields: [author_Id] , references: [id])
+  author_Id   Int
+
+  category    Category @relation(fields: [category_id] , references: [id])
+  category_id Int 
+
+  comment Comment[]
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @map("updated_at")
+}
+
+model Category {
+  id          Int @id @default(autoincrement())
+  categories  String?
+
+  post        Post[]
+
+  // post         Post @relation(fields: [category_id] , references: [id])
+  // category_id  Int @unique
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @map("updated_at")
+}
+
+model Comment {
+  id    Int @id @default(autoincrement())
+  comment String
+
+  post Post @relation(fields: [post_id], references: [id])
+  post_id  Int
+
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @map("updated_at")
+}
+
+
+model Register {
+  id         Int    @id @default(autoincrement())
+  name       String?
+  email      String?
+  password   String?
+  address    String?
+
+  post       Post[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt @map("updated_at")
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 model basic_pay {
   id         Int     @id @default(autoincrement())
@@ -49,12 +131,5 @@ model deduction {
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
-model Register {
-  id         Int    @id @default(autoincrement())
-  name       String
-  email      String
-  password   String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt @map("updated_at")
 
-}
+

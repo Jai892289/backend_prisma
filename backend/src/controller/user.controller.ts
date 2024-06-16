@@ -5,24 +5,6 @@ import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient()
 
-export const userController = async (req: Request, res: Response) => {
-
-    const { name, email, address } = req.body;
-    try {
-        const user = await prisma.user.create({
-
-            data: {
-                name: name,
-                email: email,
-                address: address
-            }
-        })
-        return res.json({ status: 200, data: user, msg: "user created" })
-
-    } catch (error) {
-        return res.status(500).json({ error: "Failed to post users" });
-    }
-}
 
 
 export const updateController = async (req: Request, res: Response) => {
@@ -212,63 +194,3 @@ export const getAllDatas = async (req: Request, res: Response) => {
 
 
 
-export const signUp = async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
-
-    try {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        const values = await prisma.register.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword
-            }
-        })
-        res.json({
-            message: "User created successfully",
-            values
-        })
-
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-export const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    try {
-        const values = await prisma.register.findFirst({
-            select: {
-                email: true,
-                password: true,
-                id: true,
-                name:true
-            },
-            where: {
-                email: email,
-            }
-        });
-
-        if (values) {
-            const dat = await bcrypt.compare(password, values.password);
-            const payload = {
-                id: values.id,
-                email: values.email,
-                name:values.name
-            }
-            if (dat) {
-                const token = jwt.sign(payload, 'your-secret-key', {
-                    expiresIn: '1h',
-                });
-                res.status(200).json({ token });
-            } else {
-                res.status(401).send('Failed');
-            }
-        }
-
-    } catch (err) {
-        console.log(err)
-    }
-}

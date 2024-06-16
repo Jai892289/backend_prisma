@@ -8,32 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.signUp = exports.getAllDatas = exports.getAllDeduction = exports.getAllBasicPay = exports.updateUser = exports.deleteUser = exports.getAllData = exports.updateController = exports.userController = void 0;
+exports.getAllDatas = exports.getAllDeduction = exports.getAllBasicPay = exports.updateUser = exports.deleteUser = exports.getAllData = exports.updateController = void 0;
 const client_1 = require("@prisma/client");
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma = new client_1.PrismaClient();
-const userController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, address } = req.body;
-    try {
-        const user = yield prisma.user.create({
-            data: {
-                name: name,
-                email: email,
-                address: address
-            }
-        });
-        return res.json({ status: 200, data: user, msg: "user created" });
-    }
-    catch (error) {
-        return res.status(500).json({ error: "Failed to post users" });
-    }
-});
-exports.userController = userController;
 const updateController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     console.log("id", id);
@@ -183,63 +161,4 @@ const getAllDatas = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getAllDatas = getAllDatas;
 ////////////////////////////////////////////////
-const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password } = req.body;
-    try {
-        const saltRounds = 10;
-        const hashedPassword = yield bcrypt_1.default.hash(password, saltRounds);
-        const values = yield prisma.register.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword
-            }
-        });
-        res.json({
-            message: "User created successfully",
-            values
-        });
-    }
-    catch (err) {
-        console.log(err);
-    }
-});
-exports.signUp = signUp;
-const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    try {
-        const values = yield prisma.register.findFirst({
-            select: {
-                email: true,
-                password: true,
-                id: true,
-                name: true
-            },
-            where: {
-                email: email,
-            }
-        });
-        if (values) {
-            const dat = yield bcrypt_1.default.compare(password, values.password);
-            const payload = {
-                id: values.id,
-                email: values.email,
-                name: values.name
-            };
-            if (dat) {
-                const token = jsonwebtoken_1.default.sign(payload, 'your-secret-key', {
-                    expiresIn: '1h',
-                });
-                res.status(200).json({ token });
-            }
-            else {
-                res.status(401).send('Failed');
-            }
-        }
-    }
-    catch (err) {
-        console.log(err);
-    }
-});
-exports.login = login;
 //# sourceMappingURL=user.controller.js.map

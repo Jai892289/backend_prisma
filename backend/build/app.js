@@ -4,17 +4,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-// import multer from 'multer';
-// import path from 'path';
-// import { PrismaClient } from '@prisma/client';
-// import cors from "cors";
-const user_controller_1 = require("./controller/user.controller");
-// import { DataController } from './controller/getAllUser.controller';
-// const dataController = new DataController();
-const user_controller_2 = require("./controller/user.controller");
 const cors_1 = __importDefault(require("cors"));
+const auth_1 = require("./middleware/auth");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const post_controller_1 = require("./controller/post.controller");
+const fileUpload_1 = require("./controller/fileUpload");
+const multer_1 = __importDefault(require("./middleware/multer"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const login_controller_1 = require("./controller/login/login.controller");
+const commonRes_1 = require("./utils/commonRes");
+const blog_controller_1 = require("./controller/blog/blog.controller");
 const app = (0, express_1.default)();
-const port = 4000;
+const PORT = process.env.PORT || 4000;
+dotenv_1.default.config();
 const corsOptions = {
     credentials: true,
     origin: ['http://localhost:3000', 'http://localhost:80']
@@ -22,70 +24,28 @@ const corsOptions = {
 // middleware
 app.use(express_1.default.json());
 app.use((0, cors_1.default)(corsOptions));
-// app.use(express.static('public'));
-// route
-app.post("/post", user_controller_1.userController);
-app.get("/find/:id", user_controller_1.updateController);
-// app.get("/get", getAllData)
-app.delete("/delete/:id", user_controller_1.deleteUser);
-app.put("/update/:id", user_controller_1.updateUser);
-// app.get('/allData', (req, res) => dataController.getAllData(req, res));
-app.get("/all", user_controller_1.getAllDatas);
-app.post("/allBasic", user_controller_1.getAllBasicPay);
-app.post("/ded", user_controller_1.getAllDeduction);
-app.get('/getAllData', user_controller_2.getAllData);
-app.post('/register', user_controller_1.signUp);
-app.post('/login', user_controller_1.login);
+app.use((0, cookie_parser_1.default)());
+// middleware
+app.post(`${commonRes_1.baseUrl}/register`, login_controller_1.signUp);
+app.post(`${commonRes_1.baseUrl}/login`, login_controller_1.login);
+app.post(`${commonRes_1.baseUrl}/post-data`, multer_1.default.single('image'), auth_1.requireAuth, blog_controller_1.authorPost);
+app.get(`${commonRes_1.baseUrl}/author-get`, blog_controller_1.authorGetPost);
+app.put(`${commonRes_1.baseUrl}/author-update`, blog_controller_1.updatePost);
+app.delete(`${commonRes_1.baseUrl}/author-delete`, blog_controller_1.deletePost);
+app.get(`${commonRes_1.baseUrl}/post-get`, auth_1.requireAuth, blog_controller_1.getPostById);
+app.get(`${commonRes_1.baseUrl}/get`, blog_controller_1.allPost);
+app.get(`${commonRes_1.baseUrl}/post`, auth_1.requireAuth, post_controller_1.getAuthorPosts);
+app.post('/upload', multer_1.default.single('image'), fileUpload_1.fileUpload);
+app.get('/upload-get', fileUpload_1.fileUploadGet);
+app.post('/category', post_controller_1.categoryPost);
+app.get('/all-category', auth_1.requireAuth, post_controller_1.categoryPostGet);
+app.get('/category-single', post_controller_1.categoryPostbyId);
+app.post('/comment', auth_1.requireAuth, post_controller_1.commentPost);
+app.get('/comment-get', post_controller_1.getAllComment);
+app.put('/comment-update', post_controller_1.updateAllPost);
+app.put('/comment-delete', post_controller_1.deleteAllComment);
 // Start the Express server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'public'); 
-//   },
-//   filename: (req, file, cb) => {
-//     // const filename = `${file.fieldname}_${Date.now()}_${path.extname(file.originalname)}`;
-//     // cb(null, filename); 
-//             cb(null, file.originalname);
-//   },
-// });
-// const upload = multer({ storage });
-// const corsOptions = {
-//   credentials: true,
-//   origin: 'http://localhost:5173', 
-// };
-// app.use(cors(corsOptions));
-// app.post('/upload', upload.single('file'), async (req, res) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ success: false, message: 'No file uploaded' });
-//     }
-//     const image  = req.file.filename;
-//     const fileData = await prisma.file.create({
-//       data: {
-//         image,
-//       },
-//     });
-//     res.status(201).json({ success: true, message: 'File uploaded successfully', file: fileData });
-//   } catch (error) {
-//     console.error('Error uploading file:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// });
-// app.get('/file', async (req, res) => {
-//   try {
-//     const files = await prisma.file.findMany();
-//     res.json({
-//       data: {
-//         files
-//     }
-//     });
-//   } catch (error) {
-//     console.error('Error fetching files:', error);
-//     res.status(500).send('Internal server error');
-//   }
-// });
-// app.post('/user', (req, res) => {
-// })
 //# sourceMappingURL=app.js.map

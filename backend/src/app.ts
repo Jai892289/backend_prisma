@@ -1,17 +1,20 @@
 import express from 'express';
-// import multer from 'multer';
-// import path from 'path';
-// import { PrismaClient } from '@prisma/client';
-// import cors from "cors";
-import { deleteUser, getAllBasicPay, getAllDatas ,  getAllDeduction, login, signUp, updateController, updateUser, userController } from './controller/user.controller';
-// import { DataController } from './controller/getAllUser.controller';
-
-// const dataController = new DataController();
-import { getAllData } from './controller/user.controller';
 import cors from "cors";
+import { requireAuth } from './middleware/auth';
+import cookieParser from "cookie-parser";
+import { categoryPost, categoryPostGet, categoryPostbyId, commentPost, deleteAllComment, getAllComment, getAuthorPosts, updateAllPost } from './controller/post.controller';
+import { fileUpload, fileUploadGet } from './controller/fileUpload';
+import upload from './middleware/multer';
+import dotenv from 'dotenv';
+import { login, signUp } from './controller/login/login.controller';
+import { baseUrl } from './utils/commonRes';
+
+import { allPost, authorGetPost, authorPost, deletePost, getPostById , updatePost} from './controller/blog/blog.controller';
 
 const app = express();
-const port = 4000;
+const PORT = process.env.PORT || 4000;
+
+dotenv.config();
 
 const corsOptions = {
     credentials: true,
@@ -22,105 +25,44 @@ const corsOptions = {
 // middleware
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
+// middleware
 
-// app.use(express.static('public'));
-
-
-// route
-app.post("/post", userController)
-app.get("/find/:id", updateController)
-// app.get("/get", getAllData)
-app.delete("/delete/:id", deleteUser)
-app.put("/update/:id", updateUser)
-
-// app.get('/allData', (req, res) => dataController.getAllData(req, res));
-
-
-app.get("/all", getAllDatas)
-
-
-app.post("/allBasic", getAllBasicPay)
-app.post("/ded", getAllDeduction)
+app.post(`${baseUrl}/register`, signUp)
+app.post(`${baseUrl}/login`, login)
 
 
 
-app.get('/getAllData', getAllData)
+app.post(`${baseUrl}/post-data`, upload.single('image'),requireAuth, authorPost)
+app.get(`${baseUrl}/author-get`, authorGetPost)
+app.put(`${baseUrl}/author-update`, updatePost)
+app.delete(`${baseUrl}/author-delete`, deletePost)
 
 
 
-app.post('/register', signUp)
-app.post('/login', login)
+app.get(`${baseUrl}/post-get`, requireAuth, getPostById)
+app.get(`${baseUrl}/get`, allPost)
+app.get(`${baseUrl}/post`,requireAuth, getAuthorPosts)
+
+
+
+app.post('/upload', upload.single('image'), fileUpload);
+app.get('/upload-get', fileUploadGet);
+
+
+app.post('/category', categoryPost)
+app.get('/all-category', requireAuth, categoryPostGet)
+app.get('/category-single', categoryPostbyId)
+
+
+app.post('/comment',requireAuth, commentPost);
+app.get('/comment-get', getAllComment);
+app.put('/comment-update', updateAllPost);
+app.put('/comment-delete', deleteAllComment);
 
 
 // Start the Express server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'public'); 
-//   },
-//   filename: (req, file, cb) => {
-//     // const filename = `${file.fieldname}_${Date.now()}_${path.extname(file.originalname)}`;
-//     // cb(null, filename); 
-//             cb(null, file.originalname);
-
-//   },
-// });
-
-// const upload = multer({ storage });
-
-// const corsOptions = {
-//   credentials: true,
-//   origin: 'http://localhost:5173', 
-// };
-
-// app.use(cors(corsOptions));
-
-
-// app.post('/upload', upload.single('file'), async (req, res) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ success: false, message: 'No file uploaded' });
-//     }
-
-//     const image  = req.file.filename;
-
-//     const fileData = await prisma.file.create({
-//       data: {
-//         image,
-//       },
-//     });
-
-//     res.status(201).json({ success: true, message: 'File uploaded successfully', file: fileData });
-//   } catch (error) {
-//     console.error('Error uploading file:', error);
-//     res.status(500).json({ success: false, message: 'Internal Server Error' });
-//   }
-// });
-
-
-// app.get('/file', async (req, res) => {
-//   try {
-//     const files = await prisma.file.findMany();
-//     res.json({
-//       data: {
-//         files
-//     }
-//     });
-//   } catch (error) {
-//     console.error('Error fetching files:', error);
-//     res.status(500).send('Internal server error');
-//   }
-// });
-
-
-// app.post('/user', (req, res) => {
-  
-// })
-
-
-
