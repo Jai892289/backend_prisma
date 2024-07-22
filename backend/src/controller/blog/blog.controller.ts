@@ -156,6 +156,9 @@ export const getPostById = async (req: Request, res: Response) => {
       where: {
         id: id,
       },
+      include: {
+            category: true,
+      },
     });
     return res.json({ status: 200, data: user, msg: "user found succesfully" });
   } catch (err) {
@@ -169,13 +172,14 @@ export const allPost = async (req: Request, res: Response) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const categoryId = Number(req.query.categoryId);
-    const search = req.query;
+    // const search = req.query;
 
     const count = await prisma.post.count();
     const totalPages = Math.ceil(count / limit);
     const skip = (page - 1) * limit;
 
-    let query: any = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = {
       skip: skip,
       take: limit,
       include: {

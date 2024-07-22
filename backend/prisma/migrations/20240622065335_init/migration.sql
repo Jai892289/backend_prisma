@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "chat_bot" ALTER COLUMN "socketId" DROP NOT NULL,
+ALTER COLUMN "name" DROP NOT NULL,
+ALTER COLUMN "room" DROP NOT NULL;

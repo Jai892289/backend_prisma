@@ -7,8 +7,14 @@ module.exports = {
  
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+    darkMode: 'class', 
+
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+           'poppins': ['Poppins'],
+        }
+    },
   },
   plugins: [],
 }

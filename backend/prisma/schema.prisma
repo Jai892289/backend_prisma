@@ -14,106 +14,92 @@ datasource db {
 }
 
 model File {
-  id          Int      @id @default(autoincrement())
-  image       String
-  buffer      Bytes?
-  size        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id        Int      @id @default(autoincrement())
+  image     String
+  buffer    Bytes?
+  size      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @map("updated_at")
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  name        String?
-  email       String?
-  address     String?
-
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt @map("updated_at")
-}
-
-model Post {
-  id          Int @id @default(autoincrement())
-  title       String
-  content     String?
-  image       String?
-
-  author      Register @relation(fields: [author_Id] , references: [id])
-  author_Id   Int
-
-  category    Category @relation(fields: [category_id] , references: [id])
-  category_id Int 
-
-  comment Comment[]
-
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt @map("updated_at")
-}
-
-model Category {
-  id          Int @id @default(autoincrement())
-  categories  String?
-
-  post        Post[]
-
-  // post         Post @relation(fields: [category_id] , references: [id])
-  // category_id  Int @unique
-
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt @map("updated_at")
-}
-
-model Comment {
-  id    Int @id @default(autoincrement())
-  comment String
-
-  post Post @relation(fields: [post_id], references: [id])
-  post_id  Int
-
-
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt @map("updated_at")
-}
-
-
-model Register {
-  id         Int    @id @default(autoincrement())
-  name       String?
-  email      String?
-  password   String?
-  address    String?
-
-  post       Post[]
+  id      Int     @id @default(autoincrement())
+  name    String?
+  email   String?
+  address String?
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
+model Post {
+  id      Int     @id @default(autoincrement())
+  title   String
+  content String?
+  image   String?
 
+  author    Register @relation(fields: [author_Id], references: [id])
+  author_Id Int
 
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id Int
 
+  comment Comment[]
 
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @map("updated_at")
+}
 
+model Category {
+  id         Int     @id @default(autoincrement())
+  categories String?
 
+  post Post[]
 
+  // post         Post @relation(fields: [category_id] , references: [id])
+  // category_id  Int @unique
 
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @map("updated_at")
+}
 
+model Comment {
+  id      Int    @id @default(autoincrement())
+  comment String
 
+  post    Post @relation(fields: [post_id], references: [id])
+  post_id Int
 
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @map("updated_at")
+}
 
+model Register {
+  id       Int     @id @default(autoincrement())
+  name     String?
+  email    String?
+  password String?
+  address  String?
 
+  post Post[]
 
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @map("updated_at")
+}
 
-
-
-
-
-
-
-
+model Cart {
+  id          Int      @id @default(autoincrement())
+  item        String?
+  price       Int?
+  quantity    Int?
+  description String?
+  wishlist    Boolean?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @map("updated_at")
+}
 
 model basic_pay {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   employeeId Int
   amount     Int?
   name       String?
@@ -122,7 +108,7 @@ model basic_pay {
 }
 
 model deduction {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   employeeId Int
   amount     Int?
   email      String?
@@ -131,5 +117,27 @@ model deduction {
   updated_at DateTime @updatedAt @map("updated_at")
 }
 
+model chat_bot {
+  id         Int      @id @default(autoincrement())
+  socketId   String?
+  name       String?
+  room       String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @map("updated_at")
+}
 
-
+model Order {
+  id Int @id @default(autoincrement())
+  address1   String?
+  address2   String?
+  landmark   String?
+  name       String?
+  pincode    String?
+  state      String?
+  total      String?
+  userEmail  String?
+  userId     Int?
+  userName   String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt @map("updated_at")
+}

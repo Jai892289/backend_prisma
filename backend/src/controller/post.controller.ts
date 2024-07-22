@@ -110,7 +110,7 @@ export const categoryPostbyId = async (req: Request, res: Response) => {
 
 
 export const commentPost = async (req: Request, res: Response) => {
-  const {  comment, post_id } = req.body;
+  const { comment, post_id } = req.body;
 
   try {
     const value = await prisma.comment.createMany({
